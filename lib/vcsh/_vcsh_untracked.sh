@@ -5,31 +5,33 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to the vcsh
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::vcsh_untracked().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
+#   ..............................
 #
 # @return Boolean $result
 #     0 / 1   ( true / false )
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::vcsh_untracked
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
+bfl::vcsh_untracked() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'sed' 'sort' 'vcsh' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  printf '/%s\n' \
+      .DS_Store .Trash .cache .local .opt .rnd Applications Desktop Documents Downloads Library Maildirs Movies Music Pictures Public
+  vcsh list-tracked |
+            sed "s=^${HOME}\(/[^/]*\).*=\1=" |
+            sort -u
+    } > "${XDG_CONFIG_HOME:-${HOME}/.config}/vcsh/ignore.d/vcsh-untracked"
+  vcsh run vcsh-untracked git status -sb
   }

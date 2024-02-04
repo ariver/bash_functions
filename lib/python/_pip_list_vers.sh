@@ -5,31 +5,31 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to Python
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::pip_list_vers().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
+#   Installs modules with defined version
 #
-# @return Boolean $result
-#     0 / 1   ( true / false )
+# @param String $pkg_list
+#   Python modules list.
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::pip_list_vers
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
+bfl::pip_list_vers() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'sed' 'pip' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local pkg
+  for pkg in "${@}"; do
+      printf '%s # ' "${pkg}"
+      pip install "${pkg}"==_ 2>&1 | sed -n 's/, / /g;s/^[[:blank:]]*Could not find a version that satisfies the requirement .*==_ (from versions: \(.*\)).*/\1/p'
+  done
   }

@@ -5,31 +5,29 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to Git commands
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::git_remote_add_origin_push().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
-#
-# @return Boolean $result
-#     0 / 1   ( true / false )
+#   ..............................
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::git_remote_add_origin_push
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
 
+# for compability with Ariver' repository
+function git_remote_add_origin_push() { bfl::git_remote_add_origin_push "$@"; return $?; }
+
+bfl::git_remote_add_origin_push() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'git' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  git remote add origin "${1}"
+  git push -u origin master
   }

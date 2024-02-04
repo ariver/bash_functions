@@ -26,11 +26,8 @@
 bfl::brew_UNINSTALL() { bfl::brew_uninstall "$@"; } # for compability with Ariver' repository
 
 bfl::brew_uninstall() {
-  local {pkgs,tmp}=    # Verify dependencies.
-  for pkgs in 'git' 'find' 'xargs' 'brew'; do
-      tmp="_BFL_HAS_${pkgs^^}"
-      [[ ${!tmp} -eq 1 ]] || { bfl::error "dependency '$tmp' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
-  done
+  # Verify dependencies.
+  bfl::verify_dependencies 'brew' 'find' 'git' 'xargs' || return $?
 
   local {fnc,ents,ent}=
   fnc="${FUNCNAME[0]}"

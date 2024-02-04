@@ -25,14 +25,12 @@
 #------------------------------------------------------------------------------
 bfl::brew_actioner() {
   # Verify arguments count.
-  (( $# > 0 && $# < 999 )) || { bfl::error "arguments count $# ∉ [1..999]."; return ${BFL_ErrCode_Not_verified_args_count}; }
+  (( $# > 0 && $# < 1000 )) || { bfl::error "arguments count $# ∉ [1..999]."; return ${BFL_ErrCode_Not_verified_args_count}; }
 
   # Verify dependencies.
-  [[ ${_BFL_HAS_BREW} -eq 1 ]] || { bfl::error "dependency 'brew' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
-  [[ ${_BFL_HAS_CAT}  -eq 1 ]] || { bfl::error "dependency 'cat' not found";  return ${BFL_ErrCode_Not_verified_dependency}; }
-  [[ ${_BFL_HAS_TPUT} -eq 1 ]] || { bfl::error "dependency 'tput' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
+  bfl::verify_dependencies 'brew' 'cat' 'tput' || return $?
 
-  declare vars=(
+  local vars=(
       str
       fnc                 # Function name, for errors, etc.
       fnc_msg             # Message code for function.
@@ -49,7 +47,7 @@ bfl::brew_actioner() {
       tc_rst              # Reset
       tc_rev              # Reverse
       )
-  declare ${vars[*]}
+  local ${vars[*]}
 
   printf -v IFS '\n\n\n'  # Delimit IO on newline only.
   fnc="${FUNCNAME[1]}"    # What was brew_actioner *called* as?

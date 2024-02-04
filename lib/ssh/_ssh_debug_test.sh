@@ -5,31 +5,33 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to the Secure Shell
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::ssh_debug_test().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
+#   ..............................
+#
+# @param String $ssh_args
+#   ssh arguments. Remainder of arguments can be pretty much anything you would otherwise provide to ssh.
 #
 # @return Boolean $result
 #     0 / 1   ( true / false )
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::ssh_debug_test "$ssh_args"
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
+bfl::ssh_debug_test() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'egrep' 'ssh' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local -i iErr=0
+  local s='Applying|identity|Found|key:|load_hostkeys:|Offering)|Authenticat|OKOKOK'
+  ssh -vvv -oControlPath=none "${@}" echo OKOKOK 2>&1 |
+        egrep --line-buffered '(debug[0-9]: (Reading|.*: '"$s"')' || { iErr=$?; bfl::writelog_fail "${FUNCNAME[0]}: Failed ssh -vvv -oControlPath=none '...' echo OKOKOK 2>&1 | egrep --line-buffered '(debug[0-9]: (Reading|.*: '$s')"; return ${iErr}; }
   }

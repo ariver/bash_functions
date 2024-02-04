@@ -5,31 +5,28 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to screen and pictures.
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::grab2clip().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
-#
-# @return Boolean $result
-#     0 / 1   ( true / false )
+#   Captures screen to buffer.
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::grab2clip
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
+bfl::grab2clip() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'screencapture' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  printf '\n'
+  screencapture -h 2>&1 | sed '1,/^ *-i /d;/^ *-m /,$d;s/^             //'
+  printf '\n'
+
+  screencapture -cio
   }

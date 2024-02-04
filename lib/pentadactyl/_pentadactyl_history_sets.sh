@@ -5,31 +5,31 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to pentadactyl
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::pentadactyl_history_sets().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
-#
-# @return Boolean $result
-#     0 / 1   ( true / false )
+#   ................................
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::pentadactyl_history_sets
+# shellcheck disable=SC2016
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
+bfl::pentadactyl_history_sets() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'sed' 'sort' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local -i iErr=0   # variables declarations
+  eval "$( bfl::___pentadactyl_common_source )" || { iErr=$?; bfl::error 'eval $( bfl::___pentadactyl_common_source )'; return ${iErr}; }
+
+  bfl::pentadactyl_history_commands |
+    sed -n "s/\(${tc_tab}set[^=]*\)=\(..*\)/\1${tc_tab}\2/p" |
+    sort -t"${tc_tab}" -k 1,1g |
+    sed "s/\(${tc_tab}set[^${tc_tab}]*\)${tc_tab}/\1=/"
   }

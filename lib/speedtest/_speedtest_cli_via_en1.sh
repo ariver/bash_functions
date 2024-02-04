@@ -5,31 +5,35 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to speedtest
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::speedtest_cli_via_en1().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
+#   ..............................
 #
-# @return Boolean $result
-#     0 / 1   ( true / false )
+# @return String $result
+#   ..............................
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::speedtest_cli_via_en1 ...
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
+bfl::speedtest_cli_via_en1() {
   # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
+  (( $# > 0 && $# < 1000 )) || { bfl::error "arguments count $# ∉ [1..999]."; return ${BFL_ErrCode_Not_verified_args_count}; }
 
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'ifconfig' 'speedtest-cli' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local en1_ip
+  en1_ip="$( ifconfig en1 )" || { bfl::writelog_fail "Failed 'ifconfig en1'"; return 1; }
+  [[ "${en1_ip}" =~ .*[[:blank:]]inet[[:blank:]]+([0-9\.]*).* ]] || { bfl::error "No IP for EN1"; return 1; }
+
+  en1_ip="${BASH_REMATCH[1]}"
+  speedtest-cli ${en1_ip:+--source ${en1_ip}} "${@}"
   }

@@ -5,31 +5,42 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to weechat
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::weechat_init().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
+#   Exports 2 weechat variables.
 #
 # @return Boolean $result
 #     0 / 1   ( true / false )
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::weechat_init
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
+bfl::weechat_INIT() {
   # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
+  #(( $# > 0 && $# < 2 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
 
-  # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+    : ${WEECHAT_HOME_DIR:=~/.weechat}
+    : ${WEECHAT_LOG_DIR:=${WEECHAT_HOME_DIR}/logs}
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local {IFS,ents,ent,tmp}=
+    printf -v IFS   ' \t\n'
+    ents=(
+        WEECHAT_HOME_DIR
+        WEECHAT_LOG_DIR
+    )
+
+  for ent in "${ents[@]}"; do
+      printf -v tmp 'tmp="${%s}"' "${ent}"
+      eval "${tmp}"
+      [[ -r "${tmp}" ]] || { bfl::error "Could not find ${ent} ( ${tmp} )!"; return 1; }
+      export "${ent}"
+  done 1>&2
   }

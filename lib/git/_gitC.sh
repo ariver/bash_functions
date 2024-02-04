@@ -5,31 +5,35 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to Git commands
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::gitC().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
-#
-# @return Boolean $result
-#     0 / 1   ( true / false )
+#   ..............................
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::gitC
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
+function gitC() { bfl::gitC "$@"; return $?; }  # for compability with Ariver' repository
 
+bfl::gitC() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'compgen' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local {tmps,tmp,tc_tab}=
+  local rgx='^([^[:blank:]]*).*[[:blank:]]git commit -m "([^"]*)"'
+  printf -v tc_tab '\t'
+
+  for tmp in $( compgen -c gitC ); do
+      [[ "${tmp}" != gitC ]] || continue
+      tmp="$( declare -f "${tmp}" )"
+      [[ "${tmp}" =~ ${rgx} ]] || continue
+      printf '%s\t%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
+  done
   }

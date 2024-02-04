@@ -26,7 +26,7 @@
 # @example
 #   bfl::brew_install '/usr/local'
 #------------------------------------------------------------------------------
-bfl::brew_INSTALL() { bfl::brew_install "$@"; } # for compability with Ariver' repository
+bfl::brew_INSTALL() { bfl::brew_install "$@"; return $?; } # for compability with Ariver' repository
 
 bfl::brew_install() {
   # Verify arguments' values.
@@ -34,8 +34,7 @@ bfl::brew_install() {
   [[ -z "$1" ]] || [[ -d "$1" ]] || install -v -d "$1" || { bfl::error "failed 'install -v -d '$1'"; return ${BFL_ErrCode_Not_verified_arg_values}; }
 
   # Verify dependencies.
-  [[ ${_BFL_HAS_CURL} -eq 1 ]] || { bfl::error "dependency 'curl' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
-  [[ ${_BFL_HAS_RUBY} -eq 1 ]] || { bfl::error "dependency 'ruby' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
+  bfl::verify_dependencies 'curl' 'ruby' || return $?
 
   local {fnc,precmd,umask_bak,dest}=
   fnc="${FUNCNAME[0]}"
@@ -55,11 +54,10 @@ bfl::brew_install() {
           } 2>/dev/null
           cmderr="${?}"
           if [[ "${cmderr}" -gt 0 ]]; then
-              [[ "${precmd[0]}" == 'sudo' ]] || { bfl::error "ERROR: Could not setup to '$dest'"; return 255; }
-              else
+              [[ "${precmd[0]}" == 'sudo' ]] && { bfl::error "ERROR: Could not setup to '$dest'"; return 255; } || {
                   precmd=( sudo -p "${fnc}: Need administrator privileges: " )
                   continue
-              fi
+              }
           fi
           break
       done

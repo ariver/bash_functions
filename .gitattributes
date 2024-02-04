@@ -1,2 +1,2 @@
 #pattern  filter=crypt diff=crypt
-UGLY.sh filter=crypt diff=crypt
+_UGLY.sh filter=crypt diff=crypt

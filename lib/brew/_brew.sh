@@ -26,35 +26,35 @@
 # for compability with Ariver' repository
 
 # brew install
-function brewI() { brew_actioner "$@"; }
+bfl::brewI() { bfl::brew_actioner "$@"; }
 
 # brew uninstall
-function brewU() { brew_actioner "$@"; }
+bfl::brewU() { bfl::brew_actioner "$@"; }
 
 # brew update
-function brewu() { brew_actioner "$@"; }
+bfl::brewu() { bfl::brew_actioner "$@"; }
 
 # brew upgrade
-function brewUp() { brew_actioner "$@"; }
+bfl::brewUp() { bfl::brew_actioner "$@"; }
 
 # brew uninstall/install (actual-reinstall)
-function brewR() { brew_actioner "$@"; }
+bfl::brewR() { bfl::brew_actioner "$@"; }
 
 # brew home
-function brewh() { brew_actioner "$@"; }
+bfl::brewh() { bfl::brew_actioner "$@"; }
 
 # brew search
-function brews() { brew_actioner "$@"; }
+bfl::brews() { bfl::brew_actioner "$@"; }
 
 # brew list
-function brewl() { brew_actioner "$@"; }
+bfl::brewl() { bfl::brew_actioner "$@"; }
 
 # brew info
-function brewi() { brew_actioner "$@"; }
+bfl::brewi() { bfl::brew_actioner "$@"; }
 
-#function brew () {
-#    # Verify dependencies.
-#    [[ ${_BFL_HAS_BREW} -eq 1 ]] || { bfl::error "dependency 'brew' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
+#bfl::brew () {
+#  # Verify dependencies.
+#  bfl::verify_dependencies 'brew' || return $?
 #
 #    # Obtain Homebrew prefix.
 #    declare prefix="$( command brew --prefix )"

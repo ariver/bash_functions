@@ -5,31 +5,36 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to Java
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::run_javaws().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
-#
-# @return Boolean $result
-#     0 / 1   ( true / false )
+#   Find lastest java web app file in downloads and run it.
 #
 # @example
-#   bfl::brew_via_proxy
+#   declare tmp
+#   tmp="$( find ~/Downloads/. -type f -name "*.jnlp*" -mmin -5 -print0 | xargs -0 ls -1rUd )"
+#   declare -p tmp
+#   bfl::run_javaws "$tmp"
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
+bfl::javaws_fromdl() {
   # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
+  [[ $# -eq 1 ]] || { bfl::error "arguments count $# ≠ 1"; return ${BFL_ErrCode_Not_verified_args_count}; }
 
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'find' 'javaws' 'sed' 'xargs' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local tmp
+  tmp="$( find ~/Downloads/. -type f -name "*.jnlp*" -mmin -5 -print0 | xargs -0 ls -1rUd )"
+  local -p tmp
+
+  echo "${tmp}" |
+        sed -n '$p' |
+        xargs -tI@ javaws -verbose -wait "@"
   }

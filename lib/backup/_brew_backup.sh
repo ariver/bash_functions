@@ -29,7 +29,7 @@
 # @example
 #   bfl::brew_backup path 'brew_backup'
 #------------------------------------------------------------------------------
-bfl::brew_BACKUP() { bfl::brew_backup "$@"; } # for compability with Ariver' repository
+bfl::brew_BACKUP() { bfl::brew_backup "$@"; return $?; }  # for compability with Ariver' repository
 
 bfl::brew_backup() {
   # Verify arguments count.
@@ -39,11 +39,8 @@ bfl::brew_backup() {
   bfl::is_blank "$1" && { bfl::error "path is required."; return ${BFL_ErrCode_Not_verified_arg_values}; }
   [[ -d "$1" ]] || { bfl::error "directory '$1' doesn't exist!"; return ${BFL_ErrCode_Not_verified_arg_values}; }
 
-  local {pkgs,tmp}=    # Verify dependencies.
-  for pkgs in 'sed' 'cut' 'grep' 'find' 'tee' 'brew' 'jq'; do
-      tmp="_BFL_HAS_${pkgs^^}"
-      [[ ${!tmp} -eq 1 ]] || { bfl::error "dependency '$tmp' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
-  done
+  # Verify dependencies.
+  bfl::verify_dependencies 'sed' 'cut' 'grep' 'find' 'tee' 'brew' 'jq' || return $?
 
   local -r file_mask=${2:-'brew_backup'}
   local -r out="$1/${file_mask}_$(date '+%Y-%m-%d_%H-%M-%S').txt"

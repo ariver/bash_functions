@@ -5,31 +5,22 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to Git commands
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::git_hub_unwatch_rkr_forks().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
+#   ..............................
 #
 # @return Boolean $result
 #     0 / 1   ( true / false )
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::git_hub_unwatch_rkr_forks
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
-  # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
-
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
-  }
+bfl::git_hub_init () { export GIT_HUB_CONFIG="${HOME}/.git-hub/config.d/github.com.config"; }

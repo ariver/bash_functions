@@ -5,31 +5,34 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to pentadactyl
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::pentadactyl_plugins_activate().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
-#
-# @return Boolean $result
-#     0 / 1   ( true / false )
+#   ................................
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::pentadactyl_plugins_activate
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
+bfl::pentadactyl_plugins_activate() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'find' 'ln' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local ENT
+  local -i iErr=0
+  cd ~/.pentadactyl/plugins/load/ || { iErr=$?; bfl::error 'Failed cd ~/.pentadactyl/plugins/load/'; return ${iErr}; }
+    for ENT in $( find ../../plugins_* -type f -a -name "*.js" -a -print ); do
+        {
+            printf "\n### %s ###\n\n" "${ENT#*/plugins_}"
+            read -p "? " -n1
+            echo
+            [[ "${REPLY}" != [yY] ]] || ln -vnfs "${ENT}"
+        } 1>&2
+    done
   }

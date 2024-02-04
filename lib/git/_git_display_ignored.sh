@@ -5,31 +5,30 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to Git commands
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::git_display_ignored().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
-#
-# @return Boolean $result
-#     0 / 1   ( true / false )
+#   ..............................
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::git_display_ignored
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
+function git_display_ignored() { bfl::git_display_ignored "$@"; return $?; }  # for compability with Ariver' repository
 
+bfl::git_display_ignored() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'cat' 'column' 'git' 'sed' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local tc_tab
+  printf -v tc_tab '\t'
+  git ls-files --others | git check-ignore --verbose --stdin |
+      sed "s/:/${tc_tab}/;s/:/${tc_tab}/" |
+      { [[ -t 1 ]] && column -ts"${tc_tab}" || cat -; }
   }

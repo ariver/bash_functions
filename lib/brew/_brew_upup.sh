@@ -25,7 +25,7 @@
 #------------------------------------------------------------------------------
 bfl::brew_upup() {
   # Verify dependencies.
-  [[ ${_BFL_HAS_BREW} -eq 1 ]] || { bfl::error "dependency 'brew' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
+  bfl::verify_dependencies 'brew' || return $?
 
   local tmp=
 

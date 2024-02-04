@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 #------------------------------------------------------------------------------
 # --------- https://github.com/AlexeiKharchev/bash_functions_library ----------
 #
@@ -26,6 +26,7 @@ readonly BFL_ErrCode_Not_verified_dependency=3
 
 #LOGFILE="${HOME}/logs/${0##*/}.log"   $(basename "$0").log - is declared in ${HOME}/getConsts
 declare -g BASH_INTERACTIVE=true   # QUIET=false
+declare -g BASH_CHECK_DEPENDENCIES_STATICALLY=true
 declare -g BASH_COLOURED=true
 
 #declare -g VERBOSE=false

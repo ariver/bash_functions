@@ -27,8 +27,7 @@ bfl::brew_stat() { bfl::brew_status "$@"; } # for compability with Ariver' repos
 
 bfl::brew_status() {
   # Verify dependencies.
-  [[ ${_BFL_HAS_SED}  -eq 1 ]] || { bfl::error "dependency 'sed' not found";  return ${BFL_ErrCode_Not_verified_dependency}; }
-  [[ ${_BFL_HAS_BREW} -eq 1 ]] || { bfl::error "dependency 'brew' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
+  bfl::verify_dependencies 'brew' 'sed' || return $?
 
   declare -x IFS
   local -a {brews_ents,brewl_ents}

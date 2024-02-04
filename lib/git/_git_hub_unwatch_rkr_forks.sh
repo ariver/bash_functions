@@ -5,31 +5,34 @@
 #------------------------------------------------------------------------------
 # ----------------- https://github.com/ariver/bash_functions ------------------
 #
-# Library of functions related to brew
+# Library of functions related to Git commands
 #
 # @author  A. River
 #
 # @file
-# Defines function: bfl::brew_via_proxy().
+# Defines function: bfl::git_hub_unwatch_rkr_forks().
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # @function
-#   Runs brew using proxychains4.
+#   ..............................
 #
 # @return Boolean $result
 #     0 / 1   ( true / false )
 #
 # @example
-#   bfl::brew_via_proxy
+#   bfl::git_hub_unwatch_rkr_forks
 #------------------------------------------------------------------------------
-bfl::brew_via_proxy() {
-  # Verify arguments count.
-  #(( $# > 0 && $# < 3 )) || { bfl::error "arguments count $# ∉ [1..2]."; return ${BFL_ErrCode_Not_verified_args_count}; }
-
+bfl::git_hub_unwatch_rkr_forks() {
   # Verify dependencies.
-  bfl::verify_dependencies 'brew' 'proxychains4' || return $?
+  bfl::verify_dependencies 'cut' 'egrep' 'paste' 'sed' 'sort' || return $?
 
-  local -i iErr
-  proxychains4 -q brew "${@}" || { iErr=$?; bfl::error "Failed 'proxychains4 -q brew '${@}'"; return ${iErr}; }
+  local {watching,arr,repo}=
+  watching="$( git-hub watching | sed -n 's/^[0-9]*) //p' )"
+  arr=$( echo "${watching}" |
+        egrep "/$( echo "${watching}" | egrep '^(racker|rackerlabs)/' | cut -d/ -f2 | sort -u | paste -sd'|' - )\$" |
+        egrep -v '^(racker|rackerlabs)/' )
+  for repo in ${arr[@]}; do
+        git-hub unwatch "${repo}"
+  done
   }

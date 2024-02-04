@@ -28,7 +28,7 @@ bfl::brew_new() {
   (($# < 2)) || { bfl::error "arguments count $# ∉ [0..1]."; return ${BFL_ErrCode_Not_verified_args_count}; }
 
   # Verify dependencies.
-  [[ ${_BFL_HAS_BREW} -eq 1 ]] || { bfl::error "dependency 'brew' not found"; return ${BFL_ErrCode_Not_verified_dependency}; }
+  bfl::verify_dependencies 'brew' || return $?
 
   local dts
   dts="$( date -r $(( $( date +%s ) - ${1:-7} * 24 * 60 * 60 )) +%Y-%m-%d )"
