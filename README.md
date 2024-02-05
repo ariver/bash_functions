@@ -1,11 +1,12 @@
-Main / [Usage](#usage) / [Libraries](#libraries) / [Installation](installation.md) / [Description](docs/description.md) / [Coding](docs/coding-standards.md) / [Configuration](#configuration) / [Examples](#examples) / [Tests](#tests) / [Templates](#templates) / [Docs](#documentation) / [ToDo](#todo)
+Main / [Usage](#usage) / [Libraries](#libraries) / [Configuration](#configuration) / [Examples](#examples) / [Docs](#documentation) / [ToDo](#todo)
 
 ## Bash Function Library (collection of utility functions)
 
 A collection of BASH utility functions and script templates used to ease the creation of portable and hardened BASH scripts with sane defaults.<br />
 Main source bash functions repository: https://github.com/AlexeiKharchev/bash_functions_library
 I load these up in my own shell environment.<br />
-If they're useful for anyone else, then great! :)
+If they're useful for anyone else, then great! :)<br />
+If you see some errors or have improvements, you can discuss it within Telegram group Bash_functions_library
 https://github.com/runsthruit
 
 #### This project is copied from several bash functions projects with the similar approach.
@@ -24,7 +25,7 @@ In short:<br />
 ```bash
 set -o allexport  # == set -a Enable using full option name syntax
 ...................... some directory declarations ......................
-readonly BASH_FUNCTION_LIBRARY='/etc/bash_functions_library/autoload.sh'
+readonly BASH_FUNCTIONS_LIBRARY='/etc/bash_functions_library/autoload.sh'
 .........................................................................
 readonly myPython='python3.8'
 readonly myPerl='5.30.0'
@@ -34,43 +35,17 @@ set +o allexport  # == set +a Disable using full option name syntax
 ```
 3) source ${HOME}/getConsts in /etc/profile (or some autoload script in /etc/profile.d)<br />
 ```bash
-source ${HOME}/getConsts
+# plug in external library
+[[ ${_GUARD_BFL_AUTOLOAD} -eq 1 ]] || { . ${HOME}/getConsts || exit 1; . "${BASH_FUNCTIONS_LIBRARY}"; }
+echo "${DarkGreen}Loading /etc/profile${NC}"
 ```
 4) run terminal and type `bfl::string_of_char 'A' 50`<br />
 Your should see `AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA` in terminal
-5) use `Bash Functions Library` in ypur scripts like this:
-```bash
-# plug in external library
-[[ ${_GUARD_BFL_autoload} -eq 1 ]] || { . ${HOME}/getConsts; . "$BASH_FUNCTION_LIBRARY" ; }
-echo "${DarkGreen}Loading /etc/profile${NC}"
-```
+5) Now you can use `Bash Functions Library` in your scripts like .profile (step 3).<br />
 As a result, `getConsts` will be loaded no more than once.<br />
 In order to handle errors there is declaration `trap 'bfl::trap_cleanup ...` in `autoload.sh`,<br />
 so you need not to additionally declare `trap`.<br />
-Log file declared in `autoload.sh`:    `readonly BASH_FUNCTION_LOG="$HOME/.faults"`
-
-### Templates
-
-Use [_library_function.sh](templates/_library_function.sh) for writing new functions.
-
-|                         Library                        |                                          Description                                              |
-|:------------------------------------------------------:|---------------------------------------------------------------------------------------------------|
-| [_library_function.sh](templates/_library_function.sh) | Use to add some new function, in order to make coding simplier and folow unified coding standards |
-| [script](templates/script)                             | Use to create a script which leverages the Bash Function Library                                  |
-
-### Additionally
-
-More detailed section **Usage** you can see [here](docs/detailed-usage.md).
-Complex `sed` find/replace operations are supported with the files located in `sedfiles/`. Read [the usage instructions](sedfiles/README.md).
-
-Basic alerting and logging and setting colors from [JMooring](https://github.com/jmooring/bash-function-library) functions (included in `autoload.sh` by default). Print messages to stdout and to a user specified logfile using the following functions.
-
-```bash
-warning "some text"   # Non-critical warnings
-error "some text"     # Prints errors and the function stack but does not stop the script.
-debug "some text"     # Printed only when in verbose (-v) mode
-   ... etc ...
-```
+Log file declared in `autoload.sh`:    `readonly BASH_FUNCTIONS_LOG="$HOME/.faults"`
 
 ### Libraries
 
@@ -79,11 +54,11 @@ Each included function includes detailed usage information. Read the inline comm
 
 |    Library   |      Description     |     |    Library   |  Description   |
 |    :---:     |         :---:        | :-: |     :---:    |      :---:     |
-|    string    |     Bash Strings     |     |    backup    |  file logging  |
+|   strings    |     Bash Strings     |     |    backup    |  file logging  |
 |     file     |                      |     |     mail     |                |
 |   directory  |                      |     |     log      |                |
 |     date     |                      |     |     ssh      |  Secure Shell  |
-|    number    |         mail         |     |   password   |   UUID, etc    |
+|   numbers    |         mail         |     |   passwords  |   UUID, etc    |
 |      url     |   url conversation   |     |    system    |  Linux System  |
 |     array    |   pass as strings    |     |   terminal   |      Bash      |
 |   directory  |                      |     |      sms     |                |
@@ -101,20 +76,22 @@ Each included function includes detailed usage information. Read the inline comm
 The following **global variables** must be set for the alert functions to work:
 | var | description | default |
 |:---:|---|:---:|
-| **`$BASH_INTERACTIVE`** | If `false`, prints to log file but not stdout | `true` |
-| **`$DEBUG`** | If `true`, prints `debug` level alerts to stdout | `false` |
-| **`$VERBOSE`** | If `true` prints all debug messages to stdout | `false` |
-| **`$DRYRUN`** | If `true` does not eval commands passed to `_execute_` function | `false` |
-| **`$RC_NOCOLOR`** | Disable coloured output. If `false`, command `tput` also needs var `$TERM` | `false` |
-| ??? | **`$BASH_FUNCTION_LIBRARY_COLOR_OUTPUT`** |  |
-| **`$LOGFILE`** | Path to a log file | `"$HOME/.faults"` |
-| **`$LOGLEVEL`** | One of: `FATAL`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `ALL`, `OFF` | `ERROR` |
+| **`${BASH_INTERACTIVE}`** | If `false`, prints to log file but not stdout | `true` |
+| **`${BASH_CHECK_DEPENDENCIES_STATICALLY}`** | If `true`, doesn't check for tool exists every time | `true` |
+| **`${DEBUG}`** | If `true`, prints `debug` level alerts to stdout | `false` |
+| **`${VERBOSE}`** | If `true` prints all debug messages to stdout | `false` |
+| **`${DRYRUN}`** | If `true` does not eval commands passed to `_execute_` function | `false` |
+| **`${RC_NOCOLOR}`** | Disable coloured output. If `false`, command `tput` also needs var `$TERM` | `false` |
+| ??? | **`${BASH_FUNCTION_LIBRARY_COLOR_OUTPUT}`** |  |
+| **`${LOGFILE}`** | Path to a log file | `"$HOME/.faults"` |
+| **`${LOGLEVEL}`** | One of: `FATAL`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `ALL`, `OFF` | `ERROR` |
 
 Temporary variables in scripts:
 | var | description |
 |:---:|---|
-| **`$SPIN_NUM`** | Used in `_terminal_spinner.sh` |
-| **`$PROGRESS_BAR_PROGRESS`** | Used in `_terminal_progressbar.sh` |
+| **`${_bfl_temporary_var}`** | Used in almost every `_.sh` script header |
+| **`${SPIN_NUM}`** | Used in `_terminal_spinner.sh` |
+| **`${PROGRESS_BAR_PROGRESS}`** | Used in `_terminal_progressbar.sh` |
 
 ### The main script `autoload.sh` is roughly split into three sections:
 #### I. TOP: Description, options and global variables:

@@ -22,13 +22,14 @@
 # @param String $str
 #   The string to be encoded.
 #
-# @return String $str_encoded
+# @return String $rslt
 #   The encoded string.
 #
 # @example
 #   bfl::encode_url "foo bar"
 #------------------------------------------------------------------------------
-bfl::urlenc() { bfl::encode_url "$@"; return $?; }  # for compability with Ariver' repository
+bfl::urlenc()    { bfl::encode_url "$@"; return $?; }  # for compability with Ariver' repository
+bfl::urlencode() { bfl::encode_url "$@"; return $?; }  # for compability with JMooring' repository
 
 bfl::encode_url() {
   # Verify arguments count.
@@ -37,40 +38,63 @@ bfl::encode_url() {
   # Verify argument values.
   bfl::is_blank "$1" && { bfl::error "Argument 1 is blank!"; return ${BFL_ErrCode_Not_verified_arg_values}; }
 
-  # Verify dependencies.
+  local rslt
   if bfl::verify_dependencies 'jq'; then
-      local rslt  # Build the return value.
-      rslt=$(jq -Rr @uri <<< "$1") || { bfl::writelog_fail "${FUNCNAME[0]}: unable to encode url $1."; return 1; }
+      local -i iErr=0  # Build the return value.
+      rslt=$(jq -Rr @uri <<< "$1") || { iErr=$?; bfl::error "Failed jq -Rr @uri <<< '$1'"; return ${iErr}; }
   else
-# ----------------- https://github.com/ariver/bash_functions ------------------
-      local {H,OLD,str,rslt}=
-      local -i {i,k}=0
-      #printf -v TAB "\t"
-      #declare LC_ALL="${LC_ALL:-C}"
-
-      OLD="${*}"
-      #printf "\n: OLD : %5d : %s\n" "${#OLD}" "${OLD}" 1>&2
-      k=${#OLD}
-      for ((i=0; i < k; i++)); do
-          str="${OLD:$i:1}"
-          unset H
-          case "$str" in
-              ( " " )                        { printf -v H "+"; } ;;
-              ( [-=\+\&_.~a-zA-Z0-9:/\?\#] ) { printf -v H %s "$str"; } ;;
-              ( * )                          { printf -v H "%%%02X" "'$str"; }
-          esac
-          rslt+="${H}"
+      local -i i=0
+      local -i k=${#1}
+      local {str,s}="$1"
+      while ((i < k)); do
+          if ((k==i+1)); then
+              s="${1: -1}"
+              [[ "$s" =~ ^[a-zA-Z0-9\.\~_-]$ ]] && printf "%s" "$s" || printf '%%%02X' "$s"
+              i+=1
+          else
+              s=${s%[^a-zA-Z0-9\.\~_-]*}
+              if [[ -n "$s" ]]; then
+                  printf "%s" "$s"
+                  i+=${#s}
+              else  # per 1 symbol. слева одинарная кавычка очень важна
+                  printf '%%%02X' "'${str:i:1}"
+                  i+=1
+              fi
+              s="${str:i}"
+          fi
       done
 # ---------- https://github.com/natelandau/shell-scripting-templates ----------
-#    for ((i = 0; i < ${#1}; i++)); do
-#        if [[ ${1:i:1} =~ ^[a-zA-Z0-9\.\~_-]$ ]]; then
-#            printf "%s" "${1:i:1}"
-#        else
-#            printf '%%%02X' "'${1:i:1}"
-#        fi
-#    done
+#      More compact, but per 1 symbol
+#      for ((i = 0; i < ${#1}; i++)); do
+#          str="${1:i:1}"
+#          if [[ "$str" =~ ^[a-zA-Z0-9\.\~_-]$ ]]; then
+#              printf "%s" "$str"
+#          else               # слева одинарная кавычка очень важна
+#              printf '%%%02X' "'$str"
+#          fi
+#      done
+# ----------------- https://github.com/ariver/bash_functions ------------------
+#      I have doubt about result
+#      local {h,tab,str,old}=
+#      printf -v tab "\t"
+#      #declare LC_ALL="${LC_ALL:-C}"
+#
+#      old="${*}"  # printf "\n: old : %5d : %s\n" "${#old}" "${old}" 1>&2
+#
+#      local -i k=${#old}
+#      for ((i=0; i < k; i++)); do
+#          str="${old:$i:1}"
+#          case "$str" in
+#              " " )                         printf -v h "+" ;;
+#              [-=\+\&_.~a-zA-Z0-9:/\?\#] )  printf -v h %s "$str" ;;
+#              * )                           printf -v h "%%%02X" "'$str" ;;
+#          esac
+#          Rslt+="$h"
+#      done
   fi
 
+  # Print the return value.
   # printf "\n: NEW : %5d : %s\n\n" "${#NEW}" "${NEW}" 1>&2
-  printf "%s\\n" "$rslt"  # Print the return value.
+  # printf "%s\\n" "$rslt"
+  printf "\\n"  # для удобства в терминале, результирующую строку не увеличивает
   }
