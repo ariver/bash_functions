@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#------------------------------------------------------------------------------
+# --------- https://github.com/AlexeiKharchev/bash_functions_library ----------
+#
+# Bash functions library loader
+#
+# @author  Alexei Kharchev
+#
+# @file
+# Global constants.
+#
+# shellcheck disable=SC2034
+#------------------------------------------------------------------------------
+
+[[ -z ${TERM+x} ]] && TERM='xterm-256color' || [[ "$TERM" == 'linux' ]] && TERM='xterm-256color'
+export TERM
+#[[ "$TERM" == 'linux' ]] && unset TERM # Почему-то не работает!
+#[[ -z ${TERM+x} ]] && readonly TERM='xterm-256color'
+
+#LOGFILE="${HOME}/logs/${0##*/}.log"   $(basename "$0").log - is declared in ${HOME}/getConsts
+declare -g BASH_FUNCTIONS_LOG="$HOME/.faults"   # =/dev/null
+readonly GIT_HUB_CONFIG="$HOME/.git-hub/config.d/github.com.config"
+readonly BFL_ErrCode_Not_verified_args_count=1
+readonly BFL_ErrCode_Not_verified_arg_values=2
+readonly BFL_ErrCode_Not_verified_dependency=3
+
+#LOGFILE="${HOME}/logs/${0##*/}.log"   $(basename "$0").log - is declared in ${HOME}/getConsts
+declare -g BASH_INTERACTIVE=true   # QUIET=false
+declare -g BASH_CHECK_DEPENDENCIES_STATICALLY=true
+declare -g BASH_COLOURED=true
+
+#declare -g VERBOSE=false
+declare -g FORCE=false
+declare -g DRYRUN=false
+
+# ----------------------------------- Logs ------------------------------------
+
+# Define the available log levels
+_bfl_temporary_var=('error' 'debug' 'warn' 'inform' 'off')
+declare -i k=${#_bfl_temporary_var}
+for str in "${_bfl_temporary_var[@]}"; do
+    readonly "_BFL_LOG_LEVEL_${str^^}"=$k
+    ((k--))
+done
+unset k _bfl_temporary_var
+
+declare -g BASH_LOG_LEVEL=${_BFL_LOG_LEVEL_ERROR}
+declare -g BASH_LOG_SHOW_TIMESTAMP=false
+
+# Define custom exception types
+readonly ERR_BAD=100
+readonly ERR_WORSE=101
+readonly ERR_CRITICAL=102
