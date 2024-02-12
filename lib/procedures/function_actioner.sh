@@ -1,5 +1,5 @@
-#! /dev/null/bash
-
+#!/usr/bin/env bash
+# Prevent this file from being sourced more than once
 function_actioner ()
 {
 
@@ -249,7 +249,7 @@ function_actioner ()
     esac
 
     return "${fnc_return}"
-    
+
 }
 
 function_locate ()

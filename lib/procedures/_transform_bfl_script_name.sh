@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# Prevent this file from being sourced more than once
 [[ "$BASH_SOURCE" =~ "${BASH_FUNCTIONS_LIBRARY%/*}" ]] &&
   {
   _bfl_temporary_var="${BASH_SOURCE%/*}"; _bfl_temporary_var="${_bfl_temporary_var##*/}/${BASH_SOURCE##*/}";

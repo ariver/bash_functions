@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# Prevent this file from being sourced more than once
 [[ "$BASH_SOURCE" =~ "${BASH_FUNCTIONS_LIBRARY%/*}" ]] && _bfl_temporary_var="$(bfl::transform_bfl_script_name ${BASH_SOURCE})" || return 0
 [[ ${!_bfl_temporary_var} -eq 1 ]] && return 0 || readonly "${_bfl_temporary_var}"=1
 #------------------------------------------------------------------------------
@@ -29,9 +29,9 @@ bfl::pentadactyl_history_sets_latest() {
   eval "$( bfl::___pentadactyl_common_source )" || { iErr=$?; bfl::error 'eval $( bfl::___pentadactyl_common_source )'; return ${iErr}; }
 
   bfl::pentadactyl_history_sets |
-    sed -n "s/\(${tc_tab}set[^=]*\)=/\1${tc_tab}/p" |
-    sort -t"${tc_tab}" -k 3,3 -k 1,1gr |
-    sort -ut"${tc_tab}" -k 3,3 |
-    sort -t"${tc_tab}" -k 1,1g |
-    sed "s/\(${tc_tab}set[^${tc_tab}]*\)${tc_tab}/\1=/"
+      sed -n "s/\(${tc_tab}set[^=]*\)=/\1${tc_tab}/p" |
+      sort -t"${tc_tab}" -k 3,3 -k 1,1gr |
+      sort -ut"${tc_tab}" -k 3,3 |
+      sort -t"${tc_tab}" -k 1,1g |
+      sed "s/\(${tc_tab}set[^${tc_tab}]*\)${tc_tab}/\1=/"
   }

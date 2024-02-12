@@ -1,5 +1,5 @@
-#! /dev/null/bash
-
+#!/usr/bin/env bash
+# Prevent this file from being sourced more than once
 function declare_vars_diff ()
 {
 

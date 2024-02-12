@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# Prevent this file from being sourced more than once
 [[ "$BASH_SOURCE" =~ "${BASH_FUNCTIONS_LIBRARY%/*}" ]] && _bfl_temporary_var="$(bfl::transform_bfl_script_name ${BASH_SOURCE})" || return 0
 [[ ${!_bfl_temporary_var} -eq 1 ]] && return 0 || readonly "${_bfl_temporary_var}"=1
 #------------------------------------------------------------------------------
@@ -10,7 +10,11 @@
 # @author  A. River
 #
 # @file
-# Defines function: bfl::pip_upup().
+# Defines functions:
+#                   bfl::pip_upup()
+#                   bfl::pip_pypy_upup()
+#                   bfl::pip_pypy3_upup()
+#                   bfl::pip3_upup()
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
